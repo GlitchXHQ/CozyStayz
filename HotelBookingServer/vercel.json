@@ -4,11 +4,11 @@
     {
       "src": "/api/clerk/webhooks",
       "methods": ["POST"],
-      "dest": "server.js"
+      "dest": "/api/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "/api/server.js"
     }
   ]
 }
