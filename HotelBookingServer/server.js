@@ -1,31 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-
-const { ClerkExpressWithAuth } = require("@clerk/clerk-sdk-node"); 
+const {clerkMiddleware} = require('@clerk/express')
+// const { ClerkExpressWithAuth } = require("@clerk/clerk-sdk-node"); 
 const clerkWebHooks = require("./controllers/clerkWebHooks");
 const database = require("./config/database");
-
 const app = express();
 app.use(cors());
-
-// Normal JSON parsing for all NON-WEBHOOK routes
 app.use(express.json());
-
-// Clerk auth middleware for all protected backend routes
-app.use(ClerkExpressWithAuth());
-
-// ************* IMPORTANT *************
-// Webhooks MUST use RAW BODY
-app.post(
-  "/api/clerk/webhook",
-  express.raw({ type: "application/json" }),
-  clerkWebHooks
-);
-// *************************************
-
+app.use(clerkMiddleware());
+app.use("/api/clerk/",clerkWebHooks);
 database();
-
 app.get("/", (req, res) => {
   res.send("Server Started Successfully");
 });

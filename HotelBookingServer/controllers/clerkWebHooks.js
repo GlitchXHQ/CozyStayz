@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const { Webhook } = require("svix");
-
+ 
 const clerkWebHooks = async (req, res) => {
   try {
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
@@ -12,32 +12,36 @@ const clerkWebHooks = async (req, res) => {
     };
 
     // Verify signature using RAW BODY BUFFER
-    const rawBody = req.body; // Buffer
-    await wh.verify(rawBody, headers);
+    //const rawBody = req.body; // Buffer
+    await wh.verify(JSON.stringify(req.body),headers);
 
     // Convert to JSON
-    const bodyString = rawBody.toString("utf8");
-    const { data, type } = JSON.parse(bodyString);
+    // const bodyString = rawBody.toString("utf8");
+    const { data, type } = req.body
 
     const userData = {
-      clerkId: data.id,
+      _id: data.id,
       email: data.email_addresses?.[0]?.email_address || "",
-      username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
+      username: data.first_name + " " + data.last_name + "" ,
       image: data.image_url || "",
     };
 
     switch (type) {
-      case "user.created":
+      case "user.created":{
         await User.create(userData);
         break;
+      }
 
-      case "user.updated":
-        await User.findOneAndUpdate({ clerkId: data.id }, userData);
+      case "user.updated":{
+        await User.findOneAndUpdate(data.id, userData);
         break;
-
-      case "user.deleted":
-        await User.findOneAndDelete({ clerkId: data.id });
+      }
+      case "user.deleted":{
+        await User.findOneAndDelete(data.id );
         break;
+        }
+      default:
+        break;  
     }
 
     return res.json({ success: true, message: "Webhook received" });
