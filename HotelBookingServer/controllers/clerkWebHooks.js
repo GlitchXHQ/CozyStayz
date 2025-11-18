@@ -5,7 +5,7 @@ const { Webhook } = require("svix");
 
 router.post("/", async (req, res) => {
   try {
-    const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    const wh = new Webhook(process.env.WEBHOOK_SECRET);
 
     const headers = {
       "svix-id": req.headers["svix-id"],

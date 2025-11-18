@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
       req.on("end", () => resolve(Buffer.concat(data)));
     });
 
-    const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    const wh = new Webhook(process.env.WEBHOOK_SECRET);
 
     const evt = wh.verify(payload, {
       "svix-id": req.headers["svix-id"],
