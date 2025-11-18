@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
 
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error("Webhook Error:", err);
+    console.error(err);
     res.status(400).json({ error: err.message });
   }
 });
