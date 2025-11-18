@@ -3,8 +3,8 @@
   "routes": [
     {
       "src": "/api/clerk/webhooks",
-      "dest": "server.js",
-      "methods": ["POST"]
+      "methods": ["POST"],
+      "dest": "server.js"
     },
     {
       "src": "/(.*)",
