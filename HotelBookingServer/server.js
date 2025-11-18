@@ -1,26 +1,21 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const {clerkMiddleware} = require('@clerk/express')
 const clerkWebHooks = require("./controllers/clerkWebHooks");
 const database = require("./config/database");
+
 const app = express();
-app.use(cors());
 database();
-app.use(
+app.use(cors());
+
+app.post(
   "/api/clerk/webhook",
-  express.raw({ type: "application/json" })
+  express.raw({ type: "application/json" }),
+  clerkWebHooks
 );
+
+// JSON for all other routes
 app.use(express.json());
-app.use(clerkMiddleware());
 
-app.post("/api/clerk/webhook", clerkWebHooks);
-
-app.get("/", (req, res) => {
-  res.send("Server Started Successfully");
-});
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Click Here: http://localhost:${PORT}`);
-})
+app.get("/", (req, res) => res.send("Server running"));
+module.exports = app;
