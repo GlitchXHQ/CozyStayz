@@ -1,19 +1,10 @@
 {
   "version": 2,
-  "functions": {
-    "server.js": {
-      "runtime": "nodejs20.x",
-      "memory": 256
-    }
-  },
   "routes": [
     {
       "src": "/api/clerk/webhooks",
       "dest": "server.js",
-      "methods": ["POST"],
-      "headers": {
-        "Content-Type": "application/json"
-      }
+      "methods": ["POST"]
     },
     {
       "src": "/(.*)",
