@@ -11,13 +11,13 @@ const clerkWebHooks = async (req, res) => {
       "svix-signature": req.headers["svix-signature"],
     };
 
-    const evt = wh.verify(req.body, headers); // req.body is RAW
-    const { data, type } = evt;
+    const evt = wh.verify(JSON.stringify(req.body), headers);
+    const { data, type } = req.body
 
     const userData = {
       _id: data.id,
-      username: `${data.first_name || ""} ${data.last_name || ""}`,
-      email: data.email_addresses?.[0]?.email_address || "",
+      username: data.first_name+ " "+ data.last_name || "",
+      email: data.email_addresses[0].email_address || "",
       image: data.image_url || "",
     };
 
@@ -29,7 +29,7 @@ const clerkWebHooks = async (req, res) => {
       await User.findOneAndDelete({ _id: data.id });
     }
 
-    res.status(200).send({ success: true });
+    res.status(200).send({ success: true,message:"WebHook Received" });
   } catch (err) {
     console.error("Webhook Error:", err);
     res.status(400).send({ error: err.message });
