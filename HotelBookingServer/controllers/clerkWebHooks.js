@@ -13,16 +13,16 @@ const clerkWebHooks = async (req, res) => {
 
     // Verify signature using RAW BODY BUFFER
     //const rawBody = req.body; // Buffer
-    await wh.verify(JSON.stringify(req.body),headers);
+    const evt= await wh.verify(req.body,headers);
 
     // Convert to JSON
     // const bodyString = rawBody.toString("utf8");
-    const { data, type } = req.body
+    const { data, type } = evt
 
     const userData = {
       _id: data.id,
-      email: data.email_addresses?.[0]?.email_address || "",
       username: data.first_name + " " + data.last_name + "" ,
+      email: data.email_addresses?.[0]?.email_address || "",
       image: data.image_url || "",
     };
 
@@ -33,22 +33,22 @@ const clerkWebHooks = async (req, res) => {
       }
 
       case "user.updated":{
-        await User.findOneAndUpdate(data.id, userData);
+        await User.findOneAndUpdate({_id:data.id}, userData);
         break;
       }
       case "user.deleted":{
-        await User.findOneAndDelete(data.id );
+        await User.findOneAndDelete({_id:data.id});
         break;
         }
       default:
         break;  
     }
 
-    return res.json({ success: true, message: "Webhook received" });
+    res.json({ success: true, message: "Webhook received" });
 
   } catch (err) {
     console.log("Clerk Webhook Error:", err);
-    return res.status(400).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
