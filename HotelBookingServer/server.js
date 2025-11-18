@@ -7,30 +7,23 @@ const database = require("./config/database");
 const { clerkMiddleware } = require("@clerk/express");
 
 database();
-
 const app = express();
 
 app.use(cors());
 
-// 1️⃣ RAW BODY FOR WEBHOOKS (must be FIRST)
-app.use(
+// 1️⃣ RAW BODY FOR WEBHOOKS — IMPORTANT
+app.post(
   "/api/clerk/webhooks",
-  express.raw({ type: "application/json" })
+  express.raw({ type: "*/*" }), 
+  clerkWebHooks
 );
 
-// 2️⃣ WEBHOOK ROUTE (only POST)
-app.use("/api/clerk/webhooks", clerkWebHooks);
-
-// 3️⃣ NORMAL JSON BODY PARSER
+// 2️⃣ NORMAL JSON for other routes
 app.use(express.json());
-
-// 4️⃣ CLERK MIDDLEWARE (after webhook)
 app.use(clerkMiddleware());
 
-// 5️⃣ TEST ROUTE
 app.get("/", (req, res) => {
   res.send("Server Started Successfully");
 });
 
-// Export for Vercel
 module.exports = app;
