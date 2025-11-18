@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-
 const clerkWebHooks = require("./controllers/clerkWebHooks");
 const database = require("./config/database");
 const { clerkMiddleware } = require("@clerk/express");
@@ -9,28 +8,26 @@ const { clerkMiddleware } = require("@clerk/express");
 database();
 
 const app = express();
-
 app.use(cors());
 
-// 1️⃣ RAW BODY FOR WEBHOOKS (must be FIRST)
+// 1️⃣ RAW BODY FOR WEBHOOKS (must use */* because Clerk sends application/clerk+json)
 app.use(
   "/api/clerk/webhooks",
-  express.raw({ type: "application/json" })
+  express.raw({ type: "*/*" })
 );
 
-// 2️⃣ WEBHOOK ROUTE (only POST)
-app.post("/api/clerk/webhooks", clerkWebHooks);
+// 2️⃣ WEBHOOK ROUTE
+app.use("/api/clerk/webhooks", clerkWebHooks);
 
-// 3️⃣ NORMAL JSON BODY PARSER
+// 3️⃣ NORMAL JSON PARSER FOR OTHER ROUTES
 app.use(express.json());
 
-// 4️⃣ CLERK MIDDLEWARE (after webhook)
+// 4️⃣ CLERK MIDDLEWARE
 app.use(clerkMiddleware());
 
-// 5️⃣ TEST ROUTE
 app.get("/", (req, res) => {
   res.send("Server Started Successfully");
 });
 
-// Export for Vercel
 module.exports = app;
+  
