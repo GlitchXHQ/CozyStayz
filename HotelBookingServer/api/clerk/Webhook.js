@@ -30,7 +30,8 @@ module.exports = async (req, res) => {
     };
 
     if (type === "user.created") {
-      await User.create(userData);
+        //Done here
+     await User.create(userData);
     } else if (type === "user.updated") {
       await User.findOneAndUpdate({ _id: data.id }, userData);
     } else if (type === "user.deleted") {
