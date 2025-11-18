@@ -1,9 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const clerkWebHooks = require("./controllers/clerkWebhooks");
 const database = require("./config/database");
-const { clerkMiddleware } = require("@clerk/express");
+const clerkWebHooks = require("./controllers/clerkWebHooks");
 
 database();
 
@@ -11,16 +10,16 @@ const app = express();
 
 app.use(cors());
 
-// 🔥 RAW BODY ONLY FOR WEBHOOK (must come BEFORE express.json)
+// RAW BODY ONLY FOR WEBHOOKS
 app.post(
   "/api/clerk/webhooks",
   express.raw({ type: "application/json" }),
   clerkWebHooks
 );
 
-// 🔥 ALL OTHER ROUTES USE NORMAL JSON
+// NORMAL JSON FOR ALL OTHER ROUTES
 app.use(express.json());
-app.use(clerkMiddleware());
+
 
 app.get("/", (req, res) => {
   res.send("Server running");
