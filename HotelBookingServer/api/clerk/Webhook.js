@@ -1,7 +1,15 @@
+export const config = {
+  api: {
+    bodyParser: false, // 
+  },
+};
+
 const { Webhook } = require("svix");
-const User = require("../../models/User");
 require("dotenv").config();
-require("../../config/database")();
+const database = require("../../config/database");
+const User = require("../../models/User");
+
+database();
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -9,16 +17,19 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const payload = req.body; // RAW BUFFER - Vercel keeps raw for serverless
+    const payload = await new Promise((resolve) => {
+      let data = [];
+      req.on("data", (chunk) => data.push(chunk));
+      req.on("end", () => resolve(Buffer.concat(data)));
+    });
+
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-    const headers = {
+    const evt = wh.verify(payload, {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"],
-    };
-
-    const evt = wh.verify(payload, headers);
+    });
 
     const { data, type } = evt;
 
@@ -29,18 +40,13 @@ module.exports = async (req, res) => {
       image: data.image_url || "",
     };
 
-    if (type === "user.created") {
-        //Done here
-     await User.create(userData);
-    } else if (type === "user.updated") {
-      await User.findOneAndUpdate({ _id: data.id }, userData);
-    } else if (type === "user.deleted") {
-      await User.findOneAndDelete({ _id: data.id });
-    }
+    if (type === "user.created") await User.create(userData);
+    if (type === "user.updated") await User.findOneAndUpdate({ _id: data.id }, userData);
+    if (type === "user.deleted") await User.findOneAndDelete({ _id: data.id });
 
-    res.status(200).json({ success: true });
+    return res.status(200).json({ success: true });
   } catch (err) {
-    console.error("Webhook Error:", err);
-    res.status(400).json({ error: err.message });
+    console.log("WEBHOOK ERROR:", err.message);
+    return res.status(400).json({ error: err.message });
   }
 };
