@@ -8,11 +8,11 @@ const app = express();
 database();
 app.use(cors());
 
-app.post(
-  "/api/clerk/webhook",
-  express.raw({ type: "application/json" }),
-  clerkWebHooks
-);
+// app.post(
+//   "/api/clerk/webhook",
+//   express.raw({ type: "application/json" }),
+//   clerkWebHooks
+// );
 
 app.use(express.json());
 
