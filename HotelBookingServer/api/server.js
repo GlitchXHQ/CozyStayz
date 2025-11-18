@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const database = require("./config/database");
-const clerkWebHooks = require("./controllers/clerkWebHooks");
+const database = require("../config/database");
+const clerkWebHooks = require("../controllers/clerkWebHooks");
 
 database();
 
