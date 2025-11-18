@@ -1,29 +1,27 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const { Webhook } = require("svix");
 
-router.post("/webhooks", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-    
+
     const headers = {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"],
     };
 
-    // Convert Buffer to string, then verify
-    const payload = req.body.toString('utf8');
+    const payload = req.body.toString("utf8");
     const evt = wh.verify(payload, headers);
-    
-    // Parse the payload manually since we used raw body
+
     const { data, type } = JSON.parse(payload);
-    
+
     const userData = {
       _id: data.id,
-      username: (data.first_name + " " + data.last_name) || "",
-      email: data.email_addresses[0].email_address || "",
+      username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
+      email: data.email_addresses?.[0]?.email_address || "",
       image: data.image_url || "",
     };
 
@@ -35,7 +33,7 @@ router.post("/webhooks", async (req, res) => {
       await User.findOneAndDelete({ _id: data.id });
     }
 
-    res.status(200).json({ success: true, message: "Webhook Received" });
+    res.status(200).json({ success: true });
   } catch (err) {
     console.error("Webhook Error:", err);
     res.status(400).json({ error: err.message });

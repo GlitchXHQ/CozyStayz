@@ -1,28 +1,36 @@
-  const express = require("express");
-  const cors = require("cors");
-  require("dotenv").config();
-  const clerkWebHooks = require("./controllers/clerkWebhooks");
-  const database = require("./config/database");
-  const {clerkMiddleware}=require('@clerk/express')
-  database();
-  const app = express()
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const clerkWebHooks = require("./controllers/clerkWebHooks");
+const database = require("./config/database");
+const { clerkMiddleware } = require("@clerk/express");
 
-  app.use(cors())
+database();
 
-  app.use("/api/clerk/webhooks", express.raw({ type: "application/json" }));
+const app = express();
+app.use(cors());
 
-  app.use(express.json());
+// 1️⃣ RAW BODY ONLY FOR WEBHOOKS
+app.use(
+  "/api/clerk/webhooks",
+  express.raw({ type: "application/json" })
+);
 
-  app.use(clerkMiddleware())
+// 2️⃣ WEBHOOK ROUTE (uses raw body)
+app.use("/api/clerk/webhooks", clerkWebHooks);
 
-  app.use("/api/clerk", clerkWebHooks);
+// 3️⃣ NORMAL JSON BODY FOR OTHER ROUTES
+app.use(express.json());
 
-  app.get("/", (req, res) => {
-    res.send("Server Started Successfully");
-  });
+// 4️⃣ CLERK MIDDLEWARE FOR PROTECTED ROUTES
+app.use(clerkMiddleware());
 
-  const PORT = process.env.PORT || 4000;
+// 5️⃣ TEST ROUTE
+app.get("/", (req, res) => {
+  res.send("Server Started Successfully");
+});
 
-  app.listen(PORT, () => {
-    console.log(`Click Here: http://localhost:${PORT}`);
-  });
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Click Here: http://localhost:${PORT}`);
+});
