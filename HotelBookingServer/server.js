@@ -14,8 +14,8 @@ app.post(
   clerkWebHooks
 );
 
-// JSON for all other routes
 app.use(express.json());
 
 app.get("/", (req, res) => res.send("Server running"));
+
 module.exports = app;

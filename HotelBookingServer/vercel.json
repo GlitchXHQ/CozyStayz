@@ -1,23 +1,20 @@
 {
   "version": 2,
-  "functions": {
-    "server.js": {
-      "runtime": "nodejs18.x",
-      "maxDuration": 10
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/clerk/webhook",
-      "dest": "server.js",
-      "methods": ["POST"],
-      "headers": {
-        "Content-Type": "application/json"
-      }
+      "dest": "/server.js",
+      "methods": ["POST"]
     },
     {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js"
     }
   ]
 }
