@@ -9,15 +9,17 @@ database();
 
 const app = express();
 
-// 🔥 RAW body ONLY for webhook route
-app.use("/api/clerk/webhooks", express.raw({ type: "application/json" }));
-
-// 🔥 Webhook route
-app.use("/api/clerk/webhooks", clerkWebHooks);
-
-// Now enable JSON for rest
-app.use(express.json());
 app.use(cors());
+
+// 🔥 RAW BODY ONLY FOR WEBHOOK (must come BEFORE express.json)
+app.post(
+  "/api/clerk/webhooks",
+  express.raw({ type: "application/json" }),
+  clerkWebHooks
+);
+
+// 🔥 ALL OTHER ROUTES USE NORMAL JSON
+app.use(express.json());
 app.use(clerkMiddleware());
 
 app.get("/", (req, res) => {
