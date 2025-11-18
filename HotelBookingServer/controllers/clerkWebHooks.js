@@ -32,7 +32,9 @@ router.post("/", async (req, res) => {
     } else if (type === "user.deleted") {
       await User.findOneAndDelete({ _id: data.id });
     }
-
+    console.log("🔥 Webhook route HIT");
+    console.log("Headers:", req.headers);
+    console.log("Raw Body:", req.body)
     res.status(200).json({ success: true });
   } catch (err) {
     console.error(err);
