@@ -2,10 +2,10 @@
   "name": "hotelbookingserver",
   "version": "1.0.0",
   "description": "",
-  "main": "api/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "npm api/server.js",
-    "dev": "nodemon api/server.js"
+    "start": "npm server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
