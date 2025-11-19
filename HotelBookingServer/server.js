@@ -9,10 +9,13 @@ database()
 const app = express();
 app.use(cors())
 
+app.post('/api/clerk',
+ express.raw({ type: "application/json" })  
+,clerkWebhooks)
+
 app.use(express.json())
 app.use(clerkMiddleware())
 
-app.use('/api/clerk',clerkWebhooks)
 
 app.get("/", (req, res) => {
   res.send("Server running");
