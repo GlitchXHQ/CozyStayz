@@ -13,31 +13,43 @@ import DashBoard from './pages/hotelOwner/DashBoard'
 import AddRoom from "./pages/hotelOwner/AddRoom"
 import ListRoom from './pages/hotelOwner/ListRoom'
 import Navbar from './components/hotelOwner/NavBar'
+import { Toaster } from 'react-hot-toast'
+import { useAppContext } from './context/AppContext'
 
 const App = () => {
 
-  const ownerPath=useLocation().pathname.includes('owner')
+  const { pathname } = useLocation()
+  const ownerPath = pathname.includes('owner')
+
+  const { showHotelReg } = useAppContext()
 
   return (
     <div>
-      {!ownerPath && <NavBar/>}
-      {ownerPath && <Navbar/>}
-      {!ownerPath && <HotelRegistration/>}
+      <Toaster />
+
+      {!ownerPath && <NavBar />}
+      {ownerPath && <Navbar />}
+
+      {/* Show registration only if state is true */}
+      {!ownerPath && showHotelReg && <HotelRegistration />}
+
       <div className='min-h-[70vh]'>
         <Routes>
-          <Route path='/' element={<Home/>}/>
-          <Route path='/About' element={<About/>}/>          
-          <Route path='/room' element={<AllRooms/>}/>
-          <Route path='/room/:id' element={<RoomDetails/>}/>
-          <Route path='/my-bookings' element={<MyBookings/>}/>
-          <Route path='/owner' element={<Layout/>}>
-            <Route index element={<DashBoard/>}/>
-            <Route path='add-room' element={<AddRoom/>}/>
-            <Route path='list-room' element={<ListRoom/>}/>
+          <Route path='/' element={<Home />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/room' element={<AllRooms />} />
+          <Route path='/room/:id' element={<RoomDetails />} />
+          <Route path='/my-bookings' element={<MyBookings />} />
+
+          <Route path='/owner' element={<Layout />}>
+            <Route index element={<DashBoard />} />
+            <Route path='add-room' element={<AddRoom />} />
+            <Route path='list-room' element={<ListRoom />} />
           </Route>
         </Routes>
       </div>
-      <Footer/>
+
+      {!ownerPath && <Footer />}
     </div>
   )
 }
